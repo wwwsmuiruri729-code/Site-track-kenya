@@ -1,6 +1,6 @@
-# [Project name]
+# SiteTrack Kenya
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A construction site management app for Kenyan contractors and site teams to track projects, daily work, and material deliveries.
 
 ## Run & Operate
 
@@ -22,23 +22,30 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/sitetrack-kenya/src/App.tsx` — web app pages and forms
+- `artifacts/sitetrack-kenya/src/index.css` — app styling and responsive layout
+- `lib/api-spec/openapi.yaml` — source API contract
+- `artifacts/api-server/src/routes/` — API endpoints
+- `lib/db/src/schema/` — PostgreSQL tables and database models
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- PostgreSQL is the durable store for project, report, and material delivery records.
+- Site report and delivery dates are calendar dates in the Africa/Nairobi time zone.
+- A project with linked reports or deliveries cannot be deleted, protecting its history.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The first stage includes an overview dashboard, project register, daily site reports, and material delivery register. Project budgets and progress are recorded in the project register; delivered-material costs can be recorded in the materials register. Labour attendance, measured quantities, site photos, and fuller cost/reporting tools are not yet included.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Build in stages and explain each development step in simple English.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Login and role-based access are not implemented yet. Do not use this version for confidential site records or publish it for public use until access controls are added.
+- Delete linked daily reports and material deliveries before deleting their project.
 
 ## Pointers
 

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SiteTrack Kenya"
+description = "A practical construction site management app for Kenyan contractors and site teams to manage projects, daily reports, and material deliveries."
+version = "1.0.0"
+id = "artifacts/sitetrack-kenya"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18804
+
+[services.development]
+run = "pnpm --filter @workspace/sitetrack-kenya run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sitetrack-kenya", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/sitetrack-kenya/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18804"
+BASE_PATH = "/"

@@ -10,6 +10,14 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Site overview and summary data
+  - name: projects
+    description: Construction project management
+  - name: reports
+    description: Daily site activity reports
+  - name: materials
+    description: Material delivery register
 paths:
   /healthz:
     get:
@@ -24,6 +32,254 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List projects
+      responses:
+        "200":
+          description: Projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          description: Invalid project details
+  /projects/{id}:
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Project not found
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Project deleted
+        "404":
+          description: Project not found
+        "409":
+          description: Project has reports or material deliveries and cannot be deleted yet
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List daily reports
+      parameters:
+        - name: projectId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Daily reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailyReport"
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Create a daily report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DailyReportInput"
+      responses:
+        "201":
+          description: Created daily report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyReport"
+        "400":
+          description: Invalid report details
+  /reports/{id}:
+    patch:
+      operationId: updateReport
+      tags: [reports]
+      summary: Update a daily report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DailyReportUpdate"
+      responses:
+        "200":
+          description: Updated report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyReport"
+        "404":
+          description: Report not found
+    delete:
+      operationId: deleteReport
+      tags: [reports]
+      summary: Delete a daily report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Report deleted
+        "404":
+          description: Report not found
+  /materials:
+    get:
+      operationId: listMaterials
+      tags: [materials]
+      summary: List material deliveries
+      parameters:
+        - name: projectId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Material deliveries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MaterialDelivery"
+    post:
+      operationId: createMaterial
+      tags: [materials]
+      summary: Record a material delivery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialDeliveryInput"
+      responses:
+        "201":
+          description: Created material delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaterialDelivery"
+        "400":
+          description: Invalid material delivery details
+  /materials/{id}:
+    patch:
+      operationId: updateMaterial
+      tags: [materials]
+      summary: Update a material delivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialDeliveryUpdate"
+      responses:
+        "200":
+          description: Updated material delivery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaterialDelivery"
+        "404":
+          description: Material delivery not found
+    delete:
+      operationId: deleteMaterial
+      tags: [materials]
+      summary: Delete a material delivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Material delivery deleted
+        "404":
+          description: Material delivery not found
 components:
   schemas:
     HealthStatus:
@@ -33,4 +289,130 @@ components:
           type: string
       required:
         - status
+    Project:
+      type: object
+      required: [id, name, client, location, status, budget, progress, startDate, targetEndDate, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        client: { type: string }
+        location: { type: string }
+        status: { type: string, enum: [active, on_hold, completed] }
+        budget: { type: number }
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        startDate: { type: ["string", "null"] }
+        targetEndDate: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+    ProjectInput:
+      type: object
+      required: [name, client, location, budget, startDate, targetEndDate]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 160 }
+        client: { type: string, minLength: 2, maxLength: 160 }
+        location: { type: string, minLength: 2, maxLength: 160 }
+        budget: { type: number, minimum: 0 }
+        progress: { type: integer, minimum: 0, maximum: 100, default: 0 }
+        status: { type: string, enum: [active, on_hold, completed], default: active }
+        startDate: { type: ["string", "null"] }
+        targetEndDate: { type: ["string", "null"] }
+    ProjectUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 2, maxLength: 160 }
+        client: { type: string, minLength: 2, maxLength: 160 }
+        location: { type: string, minLength: 2, maxLength: 160 }
+        budget: { type: number, minimum: 0 }
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        status: { type: string, enum: [active, on_hold, completed] }
+        startDate: { type: ["string", "null"] }
+        targetEndDate: { type: ["string", "null"] }
+    DailyReport:
+      type: object
+      required: [id, projectId, reportDate, weather, workersCount, workPerformed, issues, nextDayPlan, createdAt, projectName]
+      properties:
+        id: { type: integer }
+        projectId: { type: integer }
+        projectName: { type: string }
+        reportDate: { type: string }
+        weather: { type: ["string", "null"] }
+        workersCount: { type: integer }
+        workPerformed: { type: string }
+        issues: { type: ["string", "null"] }
+        nextDayPlan: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+    DailyReportInput:
+      type: object
+      required: [projectId, reportDate, workersCount, workPerformed]
+      properties:
+        projectId: { type: integer, minimum: 1 }
+        reportDate: { type: string, minLength: 10, maxLength: 10 }
+        weather: { type: string, maxLength: 80 }
+        workersCount: { type: integer, minimum: 0 }
+        workPerformed: { type: string, minLength: 2, maxLength: 3000 }
+        issues: { type: string, maxLength: 2000 }
+        nextDayPlan: { type: string, maxLength: 2000 }
+    DailyReportUpdate:
+      type: object
+      properties:
+        projectId: { type: integer, minimum: 1 }
+        reportDate: { type: string, minLength: 10, maxLength: 10 }
+        weather: { type: ["string", "null"], maxLength: 80 }
+        workersCount: { type: integer, minimum: 0 }
+        workPerformed: { type: string, minLength: 2, maxLength: 3000 }
+        issues: { type: ["string", "null"], maxLength: 2000 }
+        nextDayPlan: { type: ["string", "null"], maxLength: 2000 }
+    MaterialDelivery:
+      type: object
+      required: [id, projectId, projectName, deliveryDate, materialName, quantity, unit, supplier, unitCost, receivedBy, deliveryNote, createdAt]
+      properties:
+        id: { type: integer }
+        projectId: { type: integer }
+        projectName: { type: string }
+        deliveryDate: { type: string }
+        materialName: { type: string }
+        quantity: { type: number }
+        unit: { type: string }
+        supplier: { type: string }
+        unitCost: { type: ["number", "null"] }
+        receivedBy: { type: ["string", "null"] }
+        deliveryNote: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+    MaterialDeliveryInput:
+      type: object
+      required: [projectId, deliveryDate, materialName, quantity, unit, supplier]
+      properties:
+        projectId: { type: integer, minimum: 1 }
+        deliveryDate: { type: string, minLength: 10, maxLength: 10 }
+        materialName: { type: string, minLength: 2, maxLength: 160 }
+        quantity: { type: number, exclusiveMinimum: 0 }
+        unit: { type: string, minLength: 1, maxLength: 40 }
+        supplier: { type: string, minLength: 2, maxLength: 160 }
+        unitCost: { type: ["number", "null"], minimum: 0 }
+        receivedBy: { type: string, maxLength: 160 }
+        deliveryNote: { type: string, maxLength: 1000 }
+    MaterialDeliveryUpdate:
+      type: object
+      properties:
+        projectId: { type: integer, minimum: 1 }
+        deliveryDate: { type: string, minLength: 10, maxLength: 10 }
+        materialName: { type: string, minLength: 2, maxLength: 160 }
+        quantity: { type: number, exclusiveMinimum: 0 }
+        unit: { type: string, minLength: 1, maxLength: 40 }
+        supplier: { type: string, minLength: 2, maxLength: 160 }
+        unitCost: { type: ["number", "null"], minimum: 0 }
+        receivedBy: { type: ["string", "null"], maxLength: 160 }
+        deliveryNote: { type: ["string", "null"], maxLength: 1000 }
+    DashboardSummary:
+      type: object
+      required: [projectCount, activeProjects, reportsToday, workersToday, materialsThisMonth, recentReports]
+      properties:
+        projectCount: { type: integer }
+        activeProjects: { type: integer }
+        reportsToday: { type: integer }
+        workersToday: { type: integer }
+        materialsThisMonth: { type: integer }
+        recentReports:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyReport"
 
